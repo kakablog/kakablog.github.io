@@ -8,7 +8,13 @@
 
 #import "ProductHandler.h"
 
+@interface ProductHandler()
+@property (nonatomic, assign) BOOL appleHosted;
+@end
+
 @implementation ProductHandler
+
+
 
 - (void)getProducts {
     NSSet *set = [NSSet setWithObjects:@"product1.abc.com", @"product2.abc.com", nil];
@@ -22,6 +28,32 @@
     [[SKPaymentQueue defaultQueue] addPayment:payment];
 }
 
+- (void)appleHostedDownloads:(SKPaymentTransaction *)transaction {
+    if (transaction.downloads) {
+        //There is content needed to be download.
+        [[SKPaymentQueue defaultQueue] startDownloads:transaction.downloads];
+    }
+}
+
+- (void)finishTransaction {
+    SKPaymentQueue *queue = [SKPaymentQueue defaultQueue];
+    [queue finishTransaction:queue.transactions[0]];
+}
+
+- (void)selfHostedDownloadsWith:(NSString *)downloadID {
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration
+                                         backgroundSessionConfigurationWithIdentifier:downloadID];
+    
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:queue];
+    
+    NSURL *url = [NSURL URLWithString:@"http://abc.com/abc.zip"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    
+    NSURLSessionDownloadTask *task = [session downloadTaskWithRequest:request];
+    [task resume];
+}
+
 #pragma mark SKProductsRequestDelegate
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
     for (SKProduct *product in response.products) {
@@ -32,6 +64,8 @@
 
 #pragma mark SKPaymentTransactionObserver
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+    _appleHosted = false;
+    
     for (SKPaymentTransaction *transaction in transactions) {
         switch (transaction.transactionState) {
             case SKPaymentTransactionStatePurchasing:
@@ -39,11 +73,16 @@
             case SKPaymentTransactionStateFailed:
                 break;
             case SKPaymentTransactionStateRestored:
-                //The product is previously bought.
+                //The product is previously purchased.
                 break;
             case SKPaymentTransactionStatePurchased:
                 //Payment will be done.
-                [queue finishTransaction:transaction];
+                if (_appleHosted) {
+                    [self appleHostedDownloads:transaction];
+                }else {
+                    [self selfHostedDownloadsWith:@"downloadID"];
+                }
+
                 break;
             case SKPaymentTransactionStateDeferred:
                 //Let user back to the application.
@@ -52,6 +91,32 @@
                 break;
         }
     }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedDownloads:(NSArray *)downloads {
+    for (SKDownload *download in downloads) {
+        NSLog(@"Progress:%f", download.progress);
+        
+        if (download.downloadState == SKDownloadStateFinished) {
+            NSLog(@"Content:%@", download.contentURL.absoluteString);
+            
+            [self finishTransaction];
+        }
+    }
+}
+
+#pragma mark NSURLSessionDelegate
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
+    [self finishTransaction];
+}
+
+#pragma mark NSURLSessionDownloadDelegate
+- (void)URLSession:(NSURLSession *)session
+      downloadTask:(NSURLSessionDownloadTask *)downloadTask
+      didWriteData:(int64_t)bytesWritten
+ totalBytesWritten:(int64_t)totalBytesWritten
+totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    //use this method to get progress.
 }
 
 

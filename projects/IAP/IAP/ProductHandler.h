@@ -9,9 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 
-@interface ProductHandler : NSObject <SKProductsRequestDelegate, SKPaymentTransactionObserver>
+
+@interface ProductHandler : NSObject <SKProductsRequestDelegate, SKPaymentTransactionObserver,
+NSURLSessionDelegate, NSURLSessionDownloadDelegate>
+
 
 - (void)getProducts;
 - (void)purchaseProduct:(SKProduct *)product;
+
+- (void)finishTransaction;
+
+- (void)selfHostedDownloadsWith:(NSString *)downloadID;
 
 @end
