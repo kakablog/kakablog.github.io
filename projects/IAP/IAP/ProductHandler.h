@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 
-@interface ProductHandler : NSObject <SKProductsRequestDelegate>
+@interface ProductHandler : NSObject <SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 - (void)getProducts;
+- (void)purchaseProduct:(SKProduct *)product;
 
 @end
