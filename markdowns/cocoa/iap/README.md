@@ -93,6 +93,7 @@ Thanks to the `StoreKit`, there is no need to do anything until the transaction 
 }
 ```
 
+If need to download content, please check [Content Downloads](https://github.com/kakablog/kakablog.github.io/blob/master/markdowns/cocoa/iap/download.md) for detail.
 
 ###Make Asset Available
 
