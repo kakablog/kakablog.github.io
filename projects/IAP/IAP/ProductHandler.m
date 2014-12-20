@@ -105,6 +105,14 @@
     }
 }
 
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
+    
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
+    
+}
+
 #pragma mark NSURLSessionDelegate
 - (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
     [self finishTransaction];
