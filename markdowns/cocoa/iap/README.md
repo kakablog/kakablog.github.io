@@ -2,7 +2,7 @@
 
 [In App Purchase](https://developer.apple.com/in-app-purchase/) is becoming more and more popular. It will bring a better user experience and more revenue especially for games.
 
-
+Programmers should first design your products. The detailed information is [here](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Chapters/Products.html#//apple_ref/doc/uid/TP40008267-CH2-SW2).
 
 ##Workflow
 

@@ -1,2 +1,0 @@
-#Product Types
-
